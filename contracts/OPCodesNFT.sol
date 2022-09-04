@@ -26,7 +26,7 @@ contract OPCodeNFT is
     mapping(uint256 => OPNFTData) public nftData;
 
     Counters.Counter private _tokenIdCounter;
-    uint256 public maxSupply = 142;
+    uint256 private maxSupply = 142;
 
     constructor() ERC721("OPCodeNFT", "OPCD") {
         _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
