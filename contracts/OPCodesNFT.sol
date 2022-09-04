@@ -8,46 +8,60 @@ import "@openzeppelin/contracts/access/AccessControl.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
-
-contract OPCodeNFT is ERC721, ERC721Enumerable, ERC721URIStorage, AccessControl, Ownable {
+contract OPCodeNFT is
+    ERC721,
+    ERC721Enumerable,
+    ERC721URIStorage,
+    AccessControl,
+    Ownable
+{
     using Counters for Counters.Counter;
 
-    struct OPNFTData{
+    struct OPNFTData {
         uint256 tokenId;
         string name;
         string stack;
         address owner;
     }
-    mapping (uint256 => OPNFTData) public nftData;
+    mapping(uint256 => OPNFTData) public nftData;
 
     Counters.Counter private _tokenIdCounter;
     uint256 public maxSupply = 142;
-
-    uint256 private minRate = 1 ether;
-    uint256 private maxRate;
 
     constructor() ERC721("OPCodeNFT", "OPCD") {
         _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
     }
 
-    function safeMint(address to, string memory uri, string memory _stack, string memory _name) external payable {
+    function safeMint(
+        address to,
+        string memory uri,
+        string memory _stack,
+        string memory _name,
+        uint256 _price
+    ) external payable {
+        require(msg.value == _price);
         uint256 tokenId = _tokenIdCounter.current();
-        require(_tokenIdCounter.current() < maxSupply, "Only 143 NFTs can be minted");
+        require(tokenId < maxSupply, "Only 143 NFTs can be minted");
         _tokenIdCounter.increment();
         _safeMint(to, tokenId);
         _setTokenURI(tokenId, uri);
-        nftData[tokenId] = OPNFTData(tokenId, _name, _stack, msg.sender); 
+        nftData[tokenId] = OPNFTData(tokenId, _name, _stack, msg.sender);
     }
 
     // The following functions are overrides required by Solidity.
-    function _beforeTokenTransfer(address from, address to, uint256 tokenId)
-        internal
-        override(ERC721, ERC721Enumerable)
-    {
+
+    function _beforeTokenTransfer(
+        address from,
+        address to,
+        uint256 tokenId
+    ) internal override(ERC721, ERC721Enumerable) {
         super._beforeTokenTransfer(from, to, tokenId);
     }
 
-    function _burn(uint256 tokenId) internal override(ERC721, ERC721URIStorage) {
+    function _burn(uint256 tokenId)
+        internal
+        override(ERC721, ERC721URIStorage)
+    {
         super._burn(tokenId);
     }
 
@@ -69,7 +83,7 @@ contract OPCodeNFT is ERC721, ERC721Enumerable, ERC721URIStorage, AccessControl,
         return super.supportsInterface(interfaceId);
     }
 
-    function withdrawFunds() external payable onlyOwner{
+    function withdrawFunds() external payable onlyOwner {
         uint256 balance = address(this).balance;
         require(balance > 0);
         payable(owner()).transfer(balance);
