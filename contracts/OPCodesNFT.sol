@@ -12,20 +12,31 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 contract OPCodeNFT is ERC721, ERC721Enumerable, ERC721URIStorage, AccessControl, Ownable {
     using Counters for Counters.Counter;
 
-    Counters.Counter private _tokenIdCounter;
+    struct OPNFTData{
+        uint256 tokenId;
+        string name;
+        string stack;
+        address owner;
+    }
+    mapping (uint256 => OPNFTData) public nftData;
 
-    uint256 private minRate;
+    Counters.Counter private _tokenIdCounter;
+    uint256 public maxSupply = 142;
+
+    uint256 private minRate = 1 ether;
     uint256 private maxRate;
 
     constructor() ERC721("OPCodeNFT", "OPCD") {
         _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
     }
 
-    function safeMint(address to, string memory uri) external payable {
+    function safeMint(address to, string memory uri, string memory _stack, string memory _name) external payable {
         uint256 tokenId = _tokenIdCounter.current();
+        require(_tokenIdCounter.current() < maxSupply, "Only 143 NFTs can be minted");
         _tokenIdCounter.increment();
         _safeMint(to, tokenId);
         _setTokenURI(tokenId, uri);
+        nftData[tokenId] = OPNFTData(tokenId, _name, _stack, msg.sender); 
     }
 
     // The following functions are overrides required by Solidity.
