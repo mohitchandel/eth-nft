@@ -41,7 +41,7 @@ contract OPCodeNFT is
     ) external payable {
         require(msg.value == _price);
         uint256 tokenId = _tokenIdCounter.current();
-        require(tokenId < maxSupply, "Only 143 NFTs can be minted");
+        require(tokenId <= maxSupply, "Only 143 NFTs can be minted");
         _tokenIdCounter.increment();
         _safeMint(to, tokenId);
         _setTokenURI(tokenId, uri);
